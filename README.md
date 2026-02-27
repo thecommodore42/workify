@@ -1,1 +1,882 @@
-# workify
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workify — AI Mentor for HVAC Technicians</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:       #0A0B0A;
+  --near-black:  #111210;
+  --dark-1:      #1A1C1A;
+  --dark-2:      #222420;
+  --dark-3:      #2C2F2A;
+  --amber:       #F79646;
+  --amber-light: #FFB570;
+  --amber-dark:  #C97520;
+  --teal:        #2D6B5E;
+  --teal-dark:   #1E4A40;
+  --teal-btn:    #1E3D30;
+  --mint:        #EFF6F4;
+  --mint-mid:    #B8DDD6;
+  --white:       #F5F4F0;
+  --off-white:   #E8E6E0;
+  --gray:        #8A8A82;
+  --gray-light:  #B8B8B0;
+  --gray-dark:   #4A4A44;
+  --font-display: 'Barlow Condensed', 'Impact', sans-serif;
+  --font-body:    'Barlow', system-ui, sans-serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+  --radius-pill: 100px;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--black); color: var(--white); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 52px;
+  transition: background 0.4s, border-color 0.4s;
+  border-bottom: 1px solid transparent;
+}
+nav.scrolled { background: rgba(10,11,10,0.95); border-bottom-color: rgba(247,150,70,0.15); backdrop-filter: blur(20px); }
+.nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.nav-hexmark {
+  width: 36px; height: 36px; background: var(--amber);
+  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--black);
+}
+.nav-wordmark { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--white); letter-spacing: 3px; text-transform: uppercase; }
+.nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+.nav-links a { font-family: var(--font-mono); font-size: 11px; color: var(--gray); text-decoration: none; letter-spacing: 1.5px; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover { color: var(--amber); }
+.nav-cta { background: var(--amber) !important; color: var(--black) !important; padding: 10px 24px; border-radius: var(--radius-pill); font-family: var(--font-display) !important; font-size: 14px !important; font-weight: 700 !important; letter-spacing: 2px !important; text-transform: uppercase !important; }
+.nav-cta:hover { background: var(--amber-light) !important; transform: translateY(-1px); }
+
+/* HERO */
+.hero { position: relative; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+.hero-left { position: relative; z-index: 2; background: var(--black); padding: 160px 52px 80px; display: flex; flex-direction: column; justify-content: center; }
+.hero-right { position: relative; overflow: hidden; }
+.hero-right-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, var(--black) 0%, rgba(10,11,10,0.7) 40%, rgba(10,11,10,0.2) 100%),
+              linear-gradient(180deg, rgba(10,11,10,0.4) 0%, rgba(10,11,10,0.1) 50%, rgba(10,11,10,0.6) 100%);
+  z-index: 1;
+}
+/* Industrial grid lines matching the deck */
+.hero-right-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(247,150,70,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(247,150,70,0.05) 1px, transparent 1px);
+  background-size: 56px 56px; z-index: 2;
+}
+/* Amber diagonal accent */
+.hero-right-bg::before {
+  content: ''; position: absolute;
+  top: -100px; right: -100px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(247,150,70,0.08) 0%, transparent 70%);
+  z-index: 3;
+}
+
+.phones-wrap {
+  position: absolute; inset: 0; z-index: 4;
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 32px 40px;
+}
+
+.phones-stage { position: relative; width: 420px; height: 600px; }
+
+.phone {
+  position: absolute; border-radius: 40px; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.07);
+  transition: transform 0.4s ease;
+}
+.phone:hover { transform: translateY(-10px) !important; }
+.phone.front {
+  width: 250px; left: 50%; top: 0; transform: translateX(-50%);
+  z-index: 3;
+  box-shadow: 0 48px 96px rgba(0,0,0,0.8), 0 0 0 1px rgba(247,150,70,0.25), 0 0 48px rgba(247,150,70,0.1);
+}
+.phone.bl { width: 210px; left: 10px; top: 80px; transform: rotate(-7deg); z-index: 2; opacity: 0.8; }
+.phone.br { width: 210px; right: 10px; top: 100px; transform: rotate(7deg); z-index: 2; opacity: 0.8; }
+
+.p-notch { background: #0A0B0A; padding: 10px 0 6px; display: flex; justify-content: center; }
+.p-pill { width: 80px; height: 6px; background: #1a1c1a; border-radius: 3px; }
+
+/* DARK SCREEN */
+.s-dark { background: #0C0F0C; padding-bottom: 10px; }
+.s-dark-top { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 6px; }
+.s-dark-title { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: white; letter-spacing: 1px; }
+.s-hero-card { margin: 0 12px 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); border-radius: 14px; padding: 12px; }
+.s-hero-card-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
+.s-hero-card-sub { font-size: 9px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+.s-btn { display: flex; align-items: center; gap: 8px; margin: 0 12px 5px; background: #1E3D30; border: 1px solid rgba(45,107,94,0.3); border-radius: 22px; padding: 9px 14px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); }
+.s-bottombar { display: flex; justify-content: space-around; padding: 8px 0 4px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 6px; }
+.s-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 7px; color: rgba(255,255,255,0.35); padding: 3px 6px; border-radius: 16px; }
+.s-tab.on { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.08); }
+
+/* LIGHT SCREEN */
+.s-light { background: #EFF6F4; padding-bottom: 10px; }
+.s-light-top { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 6px; }
+.s-light-title { font-size: 13px; font-weight: 600; color: #1A2E2B; }
+.s-safety { margin: 2px 12px 8px; background: #FEE2E2; border-radius: 10px; padding: 7px 10px; font-size: 8px; color: #991B1B; line-height: 1.4; font-weight: 500; }
+.s-card { margin: 0 12px 6px; background: white; border-radius: 12px; border: 1px solid rgba(45,125,111,0.1); padding: 9px 11px; }
+.s-card-t { font-size: 10px; font-weight: 700; color: #1A2E2B; margin-bottom: 2px; }
+.s-card-s { font-size: 8px; color: #5A7872; line-height: 1.4; }
+.s-prog { height: 3px; background: #B8DDD6; border-radius: 2px; overflow: hidden; margin-top: 5px; }
+.s-prog-f { height: 100%; background: #2D6B5E; width: 43%; }
+.s-step-btns { display: flex; gap: 5px; margin-top: 7px; }
+.s-yes { flex: 1; background: #2D6B5E; color: white; border: none; border-radius: 16px; padding: 5px 6px; font-size: 9px; font-weight: 700; }
+.s-no { flex: 1; background: #D0EDE7; color: #2D6B5E; border: 1px solid rgba(45,107,94,0.2); border-radius: 16px; padding: 5px 6px; font-size: 9px; font-weight: 700; }
+.s-steps-title { font-size: 9px; font-weight: 700; color: #1A2E2B; padding: 4px 12px 5px; }
+.s-step-row { display: flex; align-items: flex-start; gap: 5px; padding: 4px 12px; font-size: 7px; color: #5A7872; line-height: 1.4; border-bottom: 1px solid rgba(45,125,111,0.06); }
+
+/* TROUBLESHOOT SCREEN */
+.s-trouble { background: #EFF6F4; padding-bottom: 10px; }
+.s-t-top { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 6px; }
+.s-t-title { font-size: 13px; font-weight: 600; color: #1A2E2B; }
+.s-t-card { margin: 0 12px 10px; background: white; border-radius: 12px; border: 1px solid rgba(45,125,111,0.1); padding: 10px 12px; }
+.s-t-card-t { font-size: 10px; font-weight: 700; color: #1A2E2B; margin-bottom: 4px; }
+.s-t-card-s { font-size: 8px; color: #5A7872; line-height: 1.5; }
+.s-t-btns { display: flex; flex-direction: column; gap: 5px; padding: 0 12px; }
+.s-t-btn { background: #B8DDD6; border-radius: 20px; padding: 9px 14px; display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 600; color: #1A2E2B; }
+.s-t-bottombar { display: flex; justify-content: space-around; padding: 8px 0 4px; border-top: 1px solid rgba(45,125,111,0.1); margin-top: 8px; background: white; }
+.s-t-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 7px; color: #8AADA7; padding: 3px 6px; border-radius: 16px; }
+.s-t-tab.on { color: #2D6B5E; background: rgba(45,107,94,0.1); }
+
+/* BADGES */
+.badge { position: absolute; background: var(--dark-1); border: 1px solid rgba(247,150,70,0.2); border-radius: 14px; padding: 10px 16px; z-index: 10; white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.5); animation: bdrift 5s ease-in-out infinite; }
+@keyframes bdrift { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.badge.b1 { bottom: 55px; left: -25px; animation-delay: 0s; }
+.badge.b2 { top: 25px; right: -20px; animation-delay: 2s; }
+.badge.b3 { bottom: 180px; right: -30px; animation-delay: 1s; }
+.badge-lbl { font-family: var(--font-mono); font-size: 9px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; }
+.badge-val { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--amber); display: block; margin-top: 2px; line-height: 1; }
+.bdot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); margin-right: 4px; animation: bpulse 1.5s ease-in-out infinite; }
+@keyframes bpulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.6)} }
+
+/* HERO TEXT */
+.eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px; color: var(--amber); text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; animation: fu 0.5s ease both; }
+.eyebrow-line { width: 40px; height: 1px; background: var(--amber); opacity: 0.5; }
+.h1 { font-family: var(--font-display); font-size: clamp(56px,5.5vw,82px); font-weight: 800; line-height: 0.92; color: var(--white); letter-spacing: -1px; text-transform: uppercase; animation: fu 0.5s 0.1s ease both; }
+.h1 .amber { color: var(--amber); }
+.h1 .ital { font-style: italic; }
+.hero-p { font-size: 17px; font-weight: 300; color: var(--gray-light); line-height: 1.65; max-width: 440px; margin: 24px 0 40px; animation: fu 0.5s 0.2s ease both; }
+.hero-p strong { color: var(--white); font-weight: 500; }
+.hero-acts { display: flex; align-items: center; gap: 20px; animation: fu 0.5s 0.3s ease both; }
+.btn-a { background: var(--amber); color: var(--black); padding: 16px 36px; border-radius: var(--radius-pill); font-family: var(--font-display); font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; box-shadow: 0 4px 24px rgba(247,150,70,0.35); border: none; cursor: pointer; }
+.btn-a:hover { background: var(--amber-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(247,150,70,0.5); }
+.btn-o { color: var(--gray-light); font-family: var(--font-mono); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--gray-dark); padding: 16px 28px; border-radius: var(--radius-pill); transition: all 0.2s; }
+.btn-o:hover { color: var(--amber); border-color: var(--amber); }
+.hero-stats { display: flex; gap: 40px; margin-top: 52px; padding-top: 40px; border-top: 1px solid rgba(247,150,70,0.12); animation: fu 0.5s 0.4s ease both; }
+.h-stat-n { font-family: var(--font-display); font-size: 34px; font-weight: 800; color: var(--amber); display: block; line-height: 1; }
+.h-stat-l { font-family: var(--font-mono); font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; display: block; }
+
+@keyframes fu { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+
+/* TICKER */
+.ticker { background: var(--amber); padding: 11px 0; overflow: hidden; position: relative; z-index: 2; }
+.ticker-track { display: flex; animation: tick 28s linear infinite; white-space: nowrap; }
+@keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.tick-item { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--black); letter-spacing: 2px; text-transform: uppercase; padding: 0 28px; flex-shrink: 0; }
+.tick-sep { color: rgba(0,0,0,0.3); }
+
+/* STATS BAR */
+.stats-bar { background: var(--dark-1); border-top: 1px solid rgba(247,150,70,0.08); border-bottom: 1px solid rgba(247,150,70,0.08); display: grid; grid-template-columns: repeat(4,1fr); position: relative; z-index: 2; }
+.stat { padding: 40px 32px; border-right: 1px solid rgba(247,150,70,0.06); text-align: center; }
+.stat:last-child { border-right: none; }
+.stat-n { font-family: var(--font-display); font-size: 52px; font-weight: 800; color: var(--amber); line-height: 1; display: block; }
+.stat-l { font-family: var(--font-mono); font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 8px; display: block; max-width: 160px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+
+/* SECTIONS */
+section { padding: 100px 52px; position: relative; z-index: 2; }
+.container { max-width: 1240px; margin: 0 auto; }
+.sec-eye { font-family: var(--font-mono); font-size: 11px; color: var(--amber); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+.sec-eye::before { content:''; width:32px; height:1px; background:var(--amber); opacity:0.5; }
+.sec-h2 { font-family: var(--font-display); font-size: clamp(38px,4vw,62px); font-weight: 800; text-transform: uppercase; line-height: 0.95; letter-spacing: -0.5px; color: var(--white); margin-bottom: 22px; }
+.sec-h2 .am { color: var(--amber); }
+.sec-p { font-size: 17px; font-weight: 300; color: var(--gray-light); line-height: 1.7; max-width: 540px; }
+
+/* HOW IT WORKS */
+.how-sec { background: var(--near-black); }
+.how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-top: 64px; }
+.how-step { display: flex; gap: 22px; padding: 26px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; position: relative; transition: background 0.2s; border-radius: 8px; }
+.how-step::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:transparent; transition:background 0.2s; border-radius:2px; }
+.how-step.active::before { background: var(--amber); }
+.how-step.active { background: rgba(247,150,70,0.04); }
+.step-n { font-family: var(--font-display); font-size: 42px; font-weight: 800; color: rgba(247,150,70,0.12); line-height: 1; flex-shrink: 0; width: 50px; transition: color 0.2s; }
+.how-step.active .step-n { color: var(--amber); }
+.step-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.35); margin-bottom: 6px; transition: color 0.2s; }
+.how-step.active .step-title { color: var(--white); }
+.step-desc { font-size: 14px; color: rgba(255,255,255,0.25); line-height: 1.6; max-height: 0; overflow: hidden; transition: max-height 0.35s ease, color 0.2s; }
+.how-step.active .step-desc { color: var(--gray-light); max-height: 100px; }
+.how-vis { position: sticky; top: 120px; }
+.flow-box { background: var(--dark-1); border: 1px solid rgba(247,150,70,0.12); border-radius: var(--radius-lg); padding: 26px; }
+.flow-ttl { font-family: var(--font-mono); font-size: 10px; color: var(--amber); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+.fdot { width:6px; height:6px; border-radius:50%; background:var(--amber); animation:bpulse 1.5s ease-in-out infinite; }
+.fn { background: var(--dark-2); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 11px 14px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255,255,255,0.65); transition: border-color 0.2s; }
+.fn:hover { border-color: rgba(247,150,70,0.25); }
+.fn-icon { width:30px; height:30px; background:rgba(247,150,70,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+.farrow { width:2px; height:14px; background:rgba(247,150,70,0.3); margin:0 auto 5px; position:relative; }
+.farrow::after { content:''; position:absolute; bottom:-4px; left:-3px; border-left:4px solid transparent; border-right:4px solid transparent; border-top:5px solid rgba(247,150,70,0.5); }
+.fbranches { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-top:8px; }
+.fb { border-radius:10px; padding:9px 7px; text-align:center; font-family:var(--font-mono); font-size:9px; line-height:1.4; }
+.fb.go { background:rgba(45,107,94,0.2); border:1px solid rgba(45,107,94,0.35); color:#6EE7D6; }
+.fb.meas { background:rgba(247,150,70,0.1); border:1px solid rgba(247,150,70,0.25); color:var(--amber-light); }
+.fb.esc { background:rgba(180,60,60,0.12); border:1px solid rgba(180,60,60,0.25); color:#FCA5A5; }
+.flog { margin-top:10px; background:rgba(45,107,94,0.1); border:1px solid rgba(45,107,94,0.2); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--gray-light); text-align:center; }
+
+/* FEATURES BENTO */
+.feat-sec { background: var(--black); }
+.bento { display:grid; grid-template-columns:repeat(12,1fr); gap:16px; margin-top:64px; }
+.fc { background:var(--dark-1); border:1px solid rgba(255,255,255,0.05); border-radius:var(--radius-lg); padding:30px; position:relative; overflow:hidden; transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s; }
+.fc:hover { transform:translateY(-4px); border-color:rgba(247,150,70,0.18); box-shadow:0 16px 40px rgba(0,0,0,0.35); }
+.fc::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(247,150,70,0.4),transparent); opacity:0; transition:opacity 0.25s; }
+.fc:hover::before { opacity:1; }
+.fc.s5 { grid-column:span 5; }
+.fc.s7 { grid-column:span 7; }
+.fc.s4 { grid-column:span 4; }
+.fc.s8 { grid-column:span 8; }
+.fc.s3 { grid-column:span 3; }
+.fc.s6 { grid-column:span 6; }
+.fc.amb { background:var(--amber); border-color:var(--amber-dark); }
+.fc.amb .fc-title { color:var(--black); }
+.fc.amb .fc-body { color:rgba(0,0,0,0.6); }
+.fc.amb .fc-tag { color:rgba(0,0,0,0.4); }
+.fc.amb .fc-icon { background:rgba(0,0,0,0.12); }
+.fc-icon { width:46px; height:46px; background:rgba(247,150,70,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:18px; }
+.fc-num { font-family:var(--font-display); font-size:88px; font-weight:800; color:rgba(247,150,70,0.05); position:absolute; bottom:12px; right:18px; line-height:1; letter-spacing:-3px; }
+.fc-title { font-family:var(--font-display); font-size:22px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--white); margin-bottom:10px; line-height:1.1; }
+.fc-body { font-size:14px; font-weight:300; color:var(--gray); line-height:1.65; max-width:320px; }
+.fc-tag { display:inline-block; margin-top:14px; font-family:var(--font-mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--amber); }
+
+/* Convo */
+.convo { background:var(--dark-2); border-radius:14px; overflow:hidden; margin-top:14px; }
+.convo-hdr { background:var(--dark-3); padding:9px 14px; font-family:var(--font-mono); font-size:9px; color:var(--amber); letter-spacing:1.5px; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
+.cdot { width:6px; height:6px; border-radius:50%; background:var(--amber); animation:bpulse 1.5s infinite; }
+.msgs { padding:12px; display:flex; flex-direction:column; gap:8px; }
+.msg { padding:8px 12px; border-radius:12px; font-size:12px; line-height:1.4; max-width:85%; }
+.mt { background:var(--dark-3); color:rgba(255,255,255,0.65); align-self:flex-end; border-bottom-right-radius:3px; }
+.mw { background:rgba(45,107,94,0.25); border:1px solid rgba(45,107,94,0.35); color:rgba(255,255,255,0.82); align-self:flex-start; border-bottom-left-radius:3px; }
+.msg-lbl { font-family:var(--font-mono); font-size:8px; letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+.mt .msg-lbl { color:var(--gray); text-align:right; }
+.mw .msg-lbl { color:#6EE7D6; }
+.msg-cite { font-family:var(--font-mono); font-size:9px; color:var(--amber); margin-top:4px; }
+
+/* PROOF */
+.proof-sec { background:var(--dark-1); border-top:1px solid rgba(247,150,70,0.07); border-bottom:1px solid rgba(247,150,70,0.07); }
+.proof-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:64px; }
+.pc { background:var(--dark-2); border:1px solid rgba(255,255,255,0.05); border-radius:var(--radius-lg); padding:30px; position:relative; overflow:hidden; transition:transform 0.25s,border-color 0.25s; }
+.pc:hover { transform:translateY(-4px); border-color:rgba(247,150,70,0.18); }
+.pc-qmark { font-family:var(--font-display); font-size:90px; line-height:0.8; color:rgba(247,150,70,0.08); position:absolute; top:16px; left:26px; }
+.pc-stars { font-size:13px; letter-spacing:3px; color:var(--amber); margin-bottom:14px; position:relative; z-index:1; }
+.pc-q { font-size:15px; font-weight:300; color:var(--off-white); line-height:1.6; margin-bottom:22px; position:relative; z-index:1; font-style:italic; }
+.pc-div { width:28px; height:1px; background:var(--amber); opacity:0.4; margin-bottom:14px; }
+.pc-auth { display:flex; align-items:center; gap:12px; }
+.pc-av { width:38px; height:38px; border-radius:50%; background:var(--dark-3); border:1px solid rgba(247,150,70,0.15); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.pc-name { font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--white); }
+.pc-role { font-family:var(--font-mono); font-size:10px; color:var(--gray); }
+
+/* COMPLIANCE */
+.comp-sec { background:var(--near-black); }
+.comp-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; margin-top:64px; }
+.comp-list { display:flex; flex-direction:column; gap:12px; }
+.ci { display:flex; gap:16px; align-items:flex-start; padding:18px 20px; background:var(--dark-1); border:1px solid rgba(255,255,255,0.04); border-left:3px solid var(--amber); border-radius:var(--radius-md); transition:background 0.2s,transform 0.2s; }
+.ci:hover { background:rgba(247,150,70,0.04); transform:translateX(5px); }
+.ci-icon { width:40px; height:40px; border-radius:10px; background:rgba(247,150,70,0.1); display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; }
+.ci-t { font-family:var(--font-display); font-size:17px; font-weight:700; letter-spacing:0.5px; color:var(--white); margin-bottom:4px; }
+.ci-d { font-size:13px; color:var(--gray); line-height:1.6; }
+.ledger { background:var(--dark-1); border:1px solid rgba(247,150,70,0.15); border-radius:var(--radius-lg); overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,0.4); }
+.l-hdr { background:var(--dark-2); border-bottom:1px solid rgba(247,150,70,0.1); padding:15px 22px; display:flex; align-items:center; justify-content:space-between; }
+.l-hdr-t { font-family:var(--font-mono); font-size:11px; color:var(--amber); letter-spacing:2px; text-transform:uppercase; }
+.l-badge { background:rgba(45,107,94,0.2); border:1px solid rgba(45,107,94,0.4); border-radius:20px; padding:4px 12px; font-family:var(--font-mono); font-size:9px; color:#6EE7D6; letter-spacing:1px; }
+.l-row { display:flex; justify-content:space-between; align-items:center; padding:11px 22px; border-bottom:1px solid rgba(255,255,255,0.04); }
+.l-row:last-child { border-bottom:none; }
+.lk { font-family:var(--font-mono); font-size:10px; color:var(--gray); text-transform:uppercase; letter-spacing:1px; }
+.lv { font-size:13px; font-weight:500; color:var(--off-white); }
+.lv.warn { color:var(--amber-light); }
+.lv.ok { color:#86EFAC; }
+.l-foot { padding:16px 22px; }
+.l-btn { width:100%; background:var(--amber); color:var(--black); border:none; border-radius:14px; padding:13px; font-family:var(--font-display); font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:background 0.2s; }
+.l-btn:hover { background:var(--amber-light); }
+
+/* PRICING */
+.price-sec { background:var(--black); }
+.price-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:64px; align-items:start; }
+.pcard { background:var(--dark-1); border:1px solid rgba(255,255,255,0.05); border-radius:var(--radius-lg); padding:34px; position:relative; transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s; }
+.pcard:hover { transform:translateY(-4px); box-shadow:0 20px 48px rgba(0,0,0,0.4); }
+.pcard.feat { background:var(--amber); border-color:var(--amber-dark); transform:scale(1.03); }
+.pcard.feat:hover { transform:scale(1.03) translateY(-4px); }
+.pop { position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:var(--black); border:1px solid var(--amber); color:var(--amber); font-family:var(--font-mono); font-size:10px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; padding:5px 18px; border-radius:20px; white-space:nowrap; }
+.ptier { font-family:var(--font-mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--gray); margin-bottom:12px; }
+.pcard.feat .ptier { color:rgba(0,0,0,0.5); }
+.pnum { font-family:var(--font-display); font-size:56px; font-weight:800; color:var(--white); line-height:1; }
+.pcard.feat .pnum { color:var(--black); }
+.pper { font-size:13px; color:var(--gray); margin-bottom:26px; }
+.pcard.feat .pper { color:rgba(0,0,0,0.5); }
+.pdiv { height:1px; background:rgba(255,255,255,0.06); margin-bottom:22px; }
+.pcard.feat .pdiv { background:rgba(0,0,0,0.15); }
+.pfeats { list-style:none; display:flex; flex-direction:column; gap:11px; }
+.pfeat { display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--gray-light); line-height:1.4; }
+.pcard.feat .pfeat { color:rgba(0,0,0,0.7); }
+.pchk { width:18px; height:18px; border-radius:50%; background:rgba(247,150,70,0.12); color:var(--amber); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; margin-top:1px; }
+.pcard.feat .pchk { background:rgba(0,0,0,0.12); color:var(--black); }
+.pbtn { display:block; width:100%; margin-top:26px; padding:14px; border-radius:var(--radius-pill); text-align:center; font-family:var(--font-display); font-size:15px; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-decoration:none; border:2px solid var(--amber); color:var(--amber); background:transparent; transition:all 0.2s; }
+.pbtn:hover { background:var(--amber); color:var(--black); }
+.pcard.feat .pbtn { background:var(--black); color:var(--amber); border-color:var(--black); }
+.pcard.feat .pbtn:hover { background:var(--dark-1); }
+
+/* CTA */
+.cta-sec { background:var(--dark-1); border-top:1px solid rgba(247,150,70,0.1); padding:110px 52px; text-align:center; position:relative; overflow:hidden; }
+.cta-sec::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 700px 500px at 50% 50%,rgba(247,150,70,0.06),transparent 70%); }
+.cta-sec .sec-h2 { max-width:780px; margin:0 auto 18px; }
+.cta-sec .sec-p { max-width:480px; margin:0 auto 48px; text-align:center; }
+.cta-acts { display:flex; align-items:center; justify-content:center; gap:22px; position:relative; z-index:1; }
+
+/* FOOTER */
+footer { background:var(--black); border-top:1px solid rgba(247,150,70,0.07); padding:60px 52px 0; }
+.foot-inner { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; max-width:1240px; margin:0 auto; padding-bottom:48px; }
+.foot-logo { font-family:var(--font-display); font-size:28px; font-weight:800; color:var(--white); letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:12px; }
+.foot-hex { width:32px; height:32px; background:var(--amber); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:var(--black); font-family:var(--font-display); }
+.foot-tag { font-family:var(--font-mono); font-size:10px; color:var(--gray-dark); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:14px; }
+.foot-desc { font-size:14px; font-weight:300; color:var(--gray); line-height:1.7; max-width:260px; }
+.foot-col-t { font-family:var(--font-mono); font-size:10px; color:var(--amber); text-transform:uppercase; letter-spacing:2px; margin-bottom:18px; }
+.foot-links { list-style:none; display:flex; flex-direction:column; gap:11px; }
+.foot-links a { font-size:14px; color:var(--gray); text-decoration:none; transition:color 0.2s; }
+.foot-links a:hover { color:var(--amber); }
+.foot-bot { border-top:1px solid rgba(255,255,255,0.04); padding:22px 0; max-width:1240px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; }
+.foot-copy { font-family:var(--font-mono); font-size:10px; color:var(--gray-dark); letter-spacing:0.8px; }
+.foot-badges { display:flex; gap:8px; }
+.fbadge { font-family:var(--font-mono); font-size:9px; color:var(--gray-dark); border:1px solid rgba(255,255,255,0.05); border-radius:5px; padding:4px 10px; }
+
+/* SCROLL REVEAL */
+.reveal { opacity:0; transform:translateY(36px); transition:opacity 0.7s ease,transform 0.7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.d1{transition-delay:0.1s} .d2{transition-delay:0.2s} .d3{transition-delay:0.3s} .d4{transition-delay:0.4s}
+
+/* RESPONSIVE */
+@media(max-width:1024px) {
+  .hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .how-grid{grid-template-columns:1fr}
+  .how-vis{position:static}
+  .fc.s5,.fc.s7,.fc.s4,.fc.s8,.fc.s3,.fc.s6{grid-column:span 6}
+  .proof-grid{grid-template-columns:1fr}
+  .comp-grid{grid-template-columns:1fr}
+  .price-grid{grid-template-columns:1fr}
+  .pcard.feat{transform:none}
+  .stats-bar{grid-template-columns:1fr 1fr}
+  .foot-inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px) {
+  nav{padding:16px 24px}
+  .nav-links{display:none}
+  .hero-left{padding:110px 24px 64px}
+  section{padding:64px 24px}
+  .h1{font-size:52px}
+  .fc.s5,.fc.s7,.fc.s4,.fc.s8,.fc.s3,.fc.s6{grid-column:span 12}
+  .stats-bar{grid-template-columns:1fr 1fr}
+  footer{padding:48px 24px 0}
+  .foot-inner{grid-template-columns:1fr 1fr;gap:28px}
+  .foot-bot{flex-direction:column;gap:14px}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-hexmark">W</div>
+    <span class="nav-wordmark">Workify</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">Process</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#compliance">Compliance</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#cta" class="nav-cta">Request Pilot</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="eyebrow"><div class="eyebrow-line"></div>AI Mentor for Skilled Trades</div>
+    <h1 class="h1">
+      Preserve<br>
+      <span class="amber ital">Expertise.</span><br>
+      Deploy It<br>
+      Instantly.
+    </h1>
+    <p class="hero-p">
+      Workify gives HVAC field technicians <strong>real-time, voice-first guidance</strong> grounded in OEM manuals, your SOPs, and EPA regulations — with safety gates that escalate instead of guessing.
+    </p>
+    <div class="hero-acts">
+      <a href="#cta" class="btn-a">
+        Request Pilot
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+      <a href="#how" class="btn-o">See How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <div><span class="h-stat-n">1.4M</span><span class="h-stat-l">Unfilled trade jobs by 2030</span></div>
+      <div><span class="h-stat-n">$325B</span><span class="h-stat-l">Projected GDP loss</span></div>
+      <div><span class="h-stat-n">14%</span><span class="h-stat-l">Average revisit rate</span></div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-right-bg"></div>
+    <div class="phones-wrap">
+      <div class="phones-stage">
+
+        <!-- Back-left: Troubleshoot screen -->
+        <div class="phone bl">
+          <div class="p-notch"><div class="p-pill"></div></div>
+          <div class="s-trouble">
+            <div class="s-t-top"><span class="s-t-title">Troubleshoot</span></div>
+            <div class="s-t-card">
+              <div class="s-t-card-t">Start a diagnostic session</div>
+              <div class="s-t-card-s">Choose an issue category. Safety gate steps will run first in every flow.</div>
+            </div>
+            <div class="s-t-btns">
+              <div class="s-t-btn">▶ No Cooling</div>
+              <div class="s-t-btn">▶ No Heat</div>
+              <div class="s-t-btn">▶ Airflow</div>
+              <div class="s-t-btn">▶ Electrical</div>
+              <div class="s-t-btn">▶ Thermostat</div>
+            </div>
+            <div class="s-t-bottombar">
+              <div class="s-t-tab">🏠<span>Home</span></div>
+              <div class="s-t-tab on">🔧<span>Troubleshoot</span></div>
+              <div class="s-t-tab">🕐<span>History</span></div>
+              <div class="s-t-tab">⚙️<span>Settings</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Front: Dark Home screen (exact Image 1 match) -->
+        <div class="phone front">
+          <div class="p-notch"><div class="p-pill"></div></div>
+          <div class="s-dark">
+            <div class="s-dark-top">
+              <span class="s-dark-title">Workify</span>
+              <span>🛡️</span>
+            </div>
+            <div class="s-hero-card">
+              <div class="s-hero-card-title">Safety-first HVAC Assistant</div>
+              <div class="s-hero-card-sub">Use Camera Assist and Voice Assist for real-time AI troubleshooting with session history.</div>
+            </div>
+            <div class="s-btn"><span>📷</span> Camera Assist</div>
+            <div class="s-btn"><span>🎙️</span> Voice Assist</div>
+            <div class="s-btn"><span>⚡</span> Start Troubleshooting</div>
+            <div class="s-btn"><span>🕐</span> View Session History</div>
+            <div class="s-bottombar">
+              <div class="s-tab on"><span>🏠</span><span>Home</span></div>
+              <div class="s-tab"><span>🔧</span><span>Troubleshoot</span></div>
+              <div class="s-tab"><span>🕐</span><span>History</span></div>
+              <div class="s-tab"><span>⚙️</span><span>Settings</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Back-right: No Cooling Flow with safety gate -->
+        <div class="phone br">
+          <div class="p-notch"><div class="p-pill"></div></div>
+          <div class="s-light">
+            <div class="s-light-top">
+              <span style="font-size:9px; color:#5A7872;">← No Cooling Flow</span>
+            </div>
+            <div class="s-safety">⚠️ Safety first: If you smell gas, see smoke, or suspect immediate danger, stop and call emergency services.</div>
+            <div class="s-card">
+              <div style="display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:#1A2E2B;">🛡️ Safety Gate <span style="color:#2D6B5E;font-weight:500;font-size:8px;">Completed</span></div>
+            </div>
+            <div class="s-card">
+              <div class="s-card-t">Progress</div>
+              <div class="s-card-s">3 of 7 decision points answered</div>
+              <div class="s-prog"><div class="s-prog-f"></div></div>
+            </div>
+            <div class="s-card">
+              <div class="s-card-t">Current Step</div>
+              <div class="s-card-s" style="margin:4px 0 6px;">Is the thermostat set to COOL and at least 3°F below room temperature?</div>
+              <div class="s-step-btns">
+                <button class="s-yes">✓ Yes</button>
+                <button class="s-no">✕ No</button>
+              </div>
+            </div>
+            <div class="s-steps-title">Recorded Steps</div>
+            <div class="s-step-row"><span>✅</span>Are you wearing PPE? [yes]</div>
+            <div class="s-step-row"><span>✅</span>Power OFF at disconnect? [yes]</div>
+            <div class="s-step-row"><span>❌</span>Gas smell detected? [no]</div>
+          </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="badge b1">
+          <div class="badge-lbl"><span class="bdot"></span>First-time fix</div>
+          <span class="badge-val">+34%</span>
+        </div>
+        <div class="badge b2">
+          <div class="badge-lbl">Callbacks reduced</div>
+          <span class="badge-val">−41%</span>
+        </div>
+        <div class="badge b3">
+          <div class="badge-lbl">Safety gate</div>
+          <span class="badge-val">Active ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="tick-item">Voice-First Guidance</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Safety-Gated Diagnosis</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">OEM Manual Grounding</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">EPA §608 Compliance</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Offline Mode</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Cited Answers Only</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">First-Time Fix</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Preserve Expertise</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Voice-First Guidance</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Safety-Gated Diagnosis</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">OEM Manual Grounding</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">EPA §608 Compliance</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Offline Mode</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Cited Answers Only</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">First-Time Fix</span><span class="tick-item tick-sep">✦</span>
+    <span class="tick-item">Preserve Expertise</span><span class="tick-item tick-sep">✦</span>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat reveal"><span class="stat-n">$159B</span><span class="stat-l">HVAC Contractor Market 2026</span></div>
+  <div class="stat reveal d1"><span class="stat-n">425K</span><span class="stat-l">HVACR Technicians in the US</span></div>
+  <div class="stat reveal d2"><span class="stat-n">120K</span><span class="stat-l">Contracting Businesses</span></div>
+  <div class="stat reveal d3"><span class="stat-n">7%</span><span class="stat-l">Average Industry Profit Margin</span></div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how-sec" id="how">
+  <div class="container">
+    <div class="sec-eye">How It Works</div>
+    <h2 class="sec-h2">From stuck to <span class="am">solved</span> — fast</h2>
+    <p class="sec-p">Not a chatbot. A field decision-support workflow built for noise, gloves, heat, and poor connectivity.</p>
+    <div class="how-grid">
+      <div>
+        <div class="how-step active" onclick="setStep(this)">
+          <div class="step-n">01</div>
+          <div><div class="step-title">Capture Context</div><div class="step-desc">Speak your symptoms or snap a photo of the nameplate. Workify transcribes via hands-free voice and pulls the equipment profile instantly — no typing.</div></div>
+        </div>
+        <div class="how-step" onclick="setStep(this)">
+          <div class="step-n">02</div>
+          <div><div class="step-title">Safety Gate First</div><div class="step-desc">Before any diagnosis, a mandatory safety-gated decision tree runs — PPE, disconnect, gas/refrigerant — with every answer time-stamped.</div></div>
+        </div>
+        <div class="how-step" onclick="setStep(this)">
+          <div class="step-n">03</div>
+          <div><div class="step-title">Cited Guidance</div><div class="step-desc">Every step is grounded in OEM manuals and your SOPs with a visible citation. If confidence is low, the UI locks until measurements are entered.</div></div>
+        </div>
+        <div class="how-step" onclick="setStep(this)">
+          <div class="step-n">04</div>
+          <div><div class="step-title">Auto Work Order</div><div class="step-desc">Session end: voice transcripts, photos, step history, and citations packaged into a work order note and pushed to ServiceTitan or Housecall Pro.</div></div>
+        </div>
+      </div>
+      <div class="how-vis">
+        <div class="flow-box reveal">
+          <div class="flow-ttl"><div class="fdot"></div>Decision Engine — Live</div>
+          <div class="fn"><div class="fn-icon">🎙️</div>Voice + photo + work order context</div>
+          <div class="farrow"></div>
+          <div class="fn"><div class="fn-icon">🛡️</div>Safety gate — PPE · disconnect · refrigerant</div>
+          <div class="farrow"></div>
+          <div class="fn"><div class="fn-icon">📖</div>RAG retriever — OEM manuals · SOPs · EPA</div>
+          <div class="farrow"></div>
+          <div class="fn" style="border-color:rgba(247,150,70,0.3);background:rgba(247,150,70,0.05);">
+            <div class="fn-icon" style="background:rgba(247,150,70,0.15);">⚖️</div>
+            <span style="color:rgba(255,255,255,0.85);">Policy engine — confidence + safety check</span>
+          </div>
+          <div class="fbranches">
+            <div class="fb go">Cited steps + checklist</div>
+            <div class="fb meas">Measurement required</div>
+            <div class="fb esc">Escalate to senior</div>
+          </div>
+          <div class="flog">📋 Work order + evidence log → FSM push</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="feat-sec" id="features">
+  <div class="container">
+    <div class="sec-eye">Built for the Jobsite</div>
+    <h2 class="sec-h2">Every pixel designed for<br><span class="am">gloves, noise,</span> and heat</h2>
+    <div class="bento">
+      <div class="fc s7 amb reveal">
+        <div class="fc-icon">🎙️</div>
+        <div class="fc-title">Hands-Free Voice Mode</div>
+        <div class="fc-body">Auto listen → AI response → spoken reply → restart listening. Your techs never touch the screen. Works in mechanical rooms, rooftops, tight attic crawls.</div>
+        <div class="fc-tag">// Voice-first design</div>
+        <div class="fc-num">01</div>
+      </div>
+      <div class="fc s5 reveal d1">
+        <div class="fc-icon">⚡</div>
+        <div class="fc-title">Safety Gate Protocol</div>
+        <div class="fc-body">PPE, disconnect, and gas checks run before any diagnosis. Won't proceed without answers — every decision logged and time-stamped.</div>
+        <div class="fc-tag">// Non-negotiable safety</div>
+        <div class="fc-num">02</div>
+      </div>
+      <div class="fc s6 reveal">
+        <div class="fc-icon">💬</div>
+        <div class="fc-title">Workify In the Field</div>
+        <div class="convo">
+          <div class="convo-hdr"><div class="cdot"></div>Live session · Carrier XR-13</div>
+          <div class="msgs">
+            <div class="msg mt"><div class="msg-lbl">Tech</div>Compressor won't start. XR-13.</div>
+            <div class="msg mw"><div class="msg-lbl">Workify</div>Check capacitor. What's your voltage reading?<div class="msg-cite">📖 Carrier XR-13 Manual §4.2</div></div>
+            <div class="msg mt"><div class="msg-lbl">Tech</div>3.2 µF</div>
+            <div class="msg mw"><div class="msg-lbl">Workify</div>Below threshold. Replace capacitor — Part #P291-4557RS<div class="msg-cite">📖 Carrier Parts Catalog 2024</div></div>
+          </div>
+        </div>
+        <div class="fc-tag">// Diagnose in minutes · Fix on first visit</div>
+      </div>
+      <div class="fc s3 reveal d1">
+        <div class="fc-icon">📵</div>
+        <div class="fc-title">Offline Mode</div>
+        <div class="fc-body">Top 20 call types cached. No signal on a rooftop? Still guided by verified procedures.</div>
+        <div class="fc-tag">// No signal required</div>
+        <div class="fc-num">04</div>
+      </div>
+      <div class="fc s3 reveal d2">
+        <div class="fc-icon">📖</div>
+        <div class="fc-title">Every Answer Cited</div>
+        <div class="fc-body">No citation = no answer. App asks for a measurement or escalates instead of guessing.</div>
+        <div class="fc-tag">// Zero confabulation</div>
+        <div class="fc-num">05</div>
+      </div>
+      <div class="fc s3 reveal d3">
+        <div class="fc-icon">📷</div>
+        <div class="fc-title">Nameplate Scan</div>
+        <div class="fc-body">One-tap camera. Model, serial, and refrigerant type auto-populated into the session.</div>
+        <div class="fc-tag">// Camera assist</div>
+        <div class="fc-num">06</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="proof-sec" id="proof">
+  <div class="container">
+    <div class="sec-eye">From the Field</div>
+    <h2 class="sec-h2">Techs who use it<br>don't <span class="am">go back</span></h2>
+    <div class="proof-grid">
+      <div class="pc reveal">
+        <div class="pc-qmark">"</div>
+        <div class="pc-stars">★★★★★</div>
+        <div class="pc-q">Used it on a no-cool I'd never seen. Walked me through every step — cited the Carrier manual each time. First-time fix.</div>
+        <div class="pc-div"></div>
+        <div class="pc-auth"><div class="pc-av">👨‍🔧</div><div><div class="pc-name">Marcus T.</div><div class="pc-role">Senior HVAC Tech · Dallas, TX</div></div></div>
+      </div>
+      <div class="pc reveal d1">
+        <div class="pc-qmark">"</div>
+        <div class="pc-stars">★★★★★</div>
+        <div class="pc-q">The safety gate showed us we were skipping PPE on hot calls. That alone is worth it — every decision is documented now.</div>
+        <div class="pc-div"></div>
+        <div class="pc-auth"><div class="pc-av">👩‍🔧</div><div><div class="pc-name">Sarah K.</div><div class="pc-role">Service Manager · Phoenix, AZ</div></div></div>
+      </div>
+      <div class="pc reveal d2">
+        <div class="pc-qmark">"</div>
+        <div class="pc-stars">★★★★★</div>
+        <div class="pc-q">New guys ramp up in half the time. They stop calling me for everything. The compliance log saves hours on refrigerant paperwork.</div>
+        <div class="pc-div"></div>
+        <div class="pc-auth"><div class="pc-av">🧑‍💼</div><div><div class="pc-name">Joe R.</div><div class="pc-role">Owner, 38-tech shop · Atlanta, GA</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPLIANCE -->
+<section class="comp-sec" id="compliance">
+  <div class="container">
+    <div class="sec-eye">Compliance Built In</div>
+    <h2 class="sec-h2">EPA §608 and AIM Act —<br><span class="am">never an afterthought</span></h2>
+    <p class="sec-p">Workify detects refrigerant-circuit work and prompts cert verification before proceeding. Every interaction logged for audit.</p>
+    <div class="comp-grid">
+      <div class="comp-list">
+        <div class="ci reveal"><div class="ci-icon">🏛️</div><div><div class="ci-t">Section 608 Certification Gate</div><div class="ci-d">Detects refrigerant-circuit work. Prompts cert type and number. Uncertified paths blocked automatically.</div></div></div>
+        <div class="ci reveal d1"><div class="ci-icon">⚗️</div><div><div class="ci-t">AIM Act Refrigerant Tracking</div><div class="ci-d">R-410A and high-GWP refrigerants flagged. Pounds recovered, date, and tech ID logged to an immutable audit trail.</div></div></div>
+        <div class="ci reveal d2"><div class="ci-icon">🔄</div><div><div class="ci-t">Auto-Updating Regulation Feed</div><div class="ci-d">HFC transition rules pulled weekly from EPA. Affected procedures flagged before the tech's next job.</div></div></div>
+        <div class="ci reveal d3"><div class="ci-icon">🔒</div><div><div class="ci-t">Immutable Evidence Log</div><div class="ci-d">Every answer, photo, and cited step time-stamped. Full audit trail when a manager asks "why did it tell you that?"</div></div></div>
+      </div>
+      <div class="reveal d1">
+        <div class="ledger">
+          <div class="l-hdr"><div class="l-hdr-t">§608 / AIM Act Log</div><div class="l-badge">✓ EPA Compliant</div></div>
+          <div>
+            <div class="l-row"><span class="lk">Cert Type</span><span class="lv">Type II — High Pressure</span></div>
+            <div class="l-row"><span class="lk">Cert Number</span><span class="lv">EPA-608-TX-44821</span></div>
+            <div class="l-row"><span class="lk">Refrigerant</span><span class="lv warn">R-410A ⚡ Phase-down Active</span></div>
+            <div class="l-row"><span class="lk">Lbs Recovered</span><span class="lv">4.2 lbs</span></div>
+            <div class="l-row"><span class="lk">AIM Act Status</span><span class="lv warn">GWP Restriction Active</span></div>
+            <div class="l-row"><span class="lk">Timestamp</span><span class="lv ok">2026-02-26 · 09:41 CST</span></div>
+            <div class="l-row"><span class="lk">Evidence Sealed</span><span class="lv ok">✓ Immutable</span></div>
+          </div>
+          <div class="l-foot"><button class="l-btn">✍ Sign &amp; Seal Record</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="price-sec" id="pricing">
+  <div class="container">
+    <div class="sec-eye">Pricing</div>
+    <h2 class="sec-h2">Below enterprise FSM.<br><span class="am">Above static training.</span></h2>
+    <p class="sec-p">Per-technician SaaS. No long-term lock-in for pilots. Built for 10–100 tech contracting shops.</p>
+    <div class="price-grid">
+      <div class="pcard reveal">
+        <div class="ptier">Core Guidance</div>
+        <div class="pnum">$30</div>
+        <div class="pper">/ tech / month · billed annually</div>
+        <div class="pdiv"></div>
+        <ul class="pfeats">
+          <li class="pfeat"><div class="pchk">✓</div>Voice + photo troubleshooting</li>
+          <li class="pfeat"><div class="pchk">✓</div>Top 20 HVAC call types</li>
+          <li class="pfeat"><div class="pchk">✓</div>Cited answers — OEM grounded</li>
+          <li class="pfeat"><div class="pchk">✓</div>Offline cached checklists</li>
+          <li class="pfeat"><div class="pchk">✓</div>Auto work order summary</li>
+        </ul>
+        <a href="#cta" class="pbtn">Start Pilot</a>
+      </div>
+      <div class="pcard feat reveal d1">
+        <div class="pop">Most Popular</div>
+        <div class="ptier">Guidance + Compliance</div>
+        <div class="pnum">$55</div>
+        <div class="pper">/ tech / month · billed annually</div>
+        <div class="pdiv"></div>
+        <ul class="pfeats">
+          <li class="pfeat"><div class="pchk">✓</div>Everything in Core</li>
+          <li class="pfeat"><div class="pchk">✓</div>§608 certification gate</li>
+          <li class="pfeat"><div class="pchk">✓</div>AIM Act refrigerant tracking</li>
+          <li class="pfeat"><div class="pchk">✓</div>Auto-updating EPA reg feed</li>
+          <li class="pfeat"><div class="pchk">✓</div>PDF audit log exports</li>
+          <li class="pfeat"><div class="pchk">✓</div>FSM push integration</li>
+        </ul>
+        <a href="#cta" class="pbtn">Start Pilot</a>
+      </div>
+      <div class="pcard reveal d2">
+        <div class="ptier">Enterprise</div>
+        <div class="pnum" style="font-size:42px;padding-top:8px;">$3K</div>
+        <div class="pper">/ contractor / year · multi-branch</div>
+        <div class="pdiv"></div>
+        <ul class="pfeats">
+          <li class="pfeat"><div class="pchk">✓</div>Everything in Compliance</li>
+          <li class="pfeat"><div class="pchk">✓</div>Admin console + analytics</li>
+          <li class="pfeat"><div class="pchk">✓</div>SSO + SCIM provisioning</li>
+          <li class="pfeat"><div class="pchk">✓</div>Custom SOP ingestion</li>
+          <li class="pfeat"><div class="pchk">✓</div>Knowledge flywheel setup</li>
+          <li class="pfeat"><div class="pchk">✓</div>Dedicated success manager</li>
+        </ul>
+        <a href="#cta" class="pbtn">Talk to Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec" id="cta">
+  <div style="position:relative;z-index:1;">
+    <div class="sec-eye" style="justify-content:center;">Get Started</div>
+    <h2 class="sec-h2" style="text-align:center;">Ready to cut callbacks<br>and fix it <span class="am">first time?</span></h2>
+    <p class="sec-p" style="text-align:center;margin:0 auto 48px;">Join HVAC contractors running 6–8 week pilots. We instrument your baseline, measure first-time-fix improvement, and show you ROI before you commit.</p>
+    <div class="cta-acts">
+      <a href="mailto:pilot@workify.ai" class="btn-a">
+        Request a Pilot
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+      <a href="mailto:demo@workify.ai" class="btn-o">Schedule a Demo</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <div>
+      <div class="foot-logo"><div class="foot-hex">W</div>Workify</div>
+      <div class="foot-tag">AI Mentor for Skilled Trades</div>
+      <p class="foot-desc">Cited, safety-gated troubleshooting for HVAC field technicians. Preserve expertise. Deploy it instantly in the field.</p>
+    </div>
+    <div>
+      <div class="foot-col-t">Product</div>
+      <ul class="foot-links">
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#compliance">Compliance</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="foot-col-t">Company</div>
+      <ul class="foot-links">
+        <li><a href="#">About</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="foot-col-t">Legal</div>
+      <ul class="foot-links">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Safety Disclaimer</a></li>
+        <li><a href="#">EPA Compliance</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bot">
+    <div class="foot-copy">© 2026 Workify Inc. · Preserve Expertise. Deploy It Instantly.</div>
+    <div class="foot-badges">
+      <div class="fbadge">NIST AI RMF</div>
+      <div class="fbadge">EPA §608</div>
+      <div class="fbadge">AIM Act</div>
+      <div class="fbadge">SOC 2 Ready</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+
+  // Scroll reveal
+  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);} }), {threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // How it works accordion + auto-rotate
+  function setStep(el) {
+    document.querySelectorAll('.how-step').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+  }
+  let si = 0;
+  const steps = document.querySelectorAll('.how-step');
+  setInterval(() => { si=(si+1)%steps.length; steps.forEach((s,i)=>s.classList.toggle('active',i===si)); }, 3800);
+</script>
+</body>
+</html>
