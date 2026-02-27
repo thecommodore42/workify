@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workify — AI Mentor for HVAC Technicians</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:       #0A0B0A;
+  --near-black:  #111210;
+  --dark-1:      #1A1C1A;
+  --dark-2:      #222420;
+  --dark-3:      #2C2F2A;
+  --amber:       #F79646;
+  --amber-light: #FFB570;
+  --amber-dark:  #C97520;
+  --teal:        #2D6B5E;
+  --teal-dark:   #1E4A40;
+  --teal-btn:    #1E3D30;
+  --mint:        #EFF6F4;
+  --mint-mid:    #B8DDD6;
+  --white:       #F5F4F0;
+  --off-white:   #E8E6E0;
+  --gray:        #8A8A82;
+  --gray-light:  #B8B8B0;
+  --gray-dark:   #4A4A44;
+  --font-display: 'Barlow Condensed', 'Impact', sans-serif;
+  --font-body:    'Barlow', system-ui, sans-serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+  --radius-pill: 100px;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--black); color: var(--white); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 52px;
+  transition: background 0.4s, border-color 0.4s;
+  border-bottom: 1px solid transparent;
+}
+nav.scrolled { background: rgba(10,11,10,0.95); border-bottom-color: rgba(247,150,70,0.15); backdrop-filter: blur(20px); }
+.nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.nav-hexmark {
+  width: 36px; height: 36px; background: var(--amber);
+  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--black);
+}
+.nav-wordmark { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--white); letter-spacing: 3px; text-transform: uppercase; }
+.nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+.nav-links a { font-family: var(--font-mono); font-size: 11px; color: var(--gray); text-decoration: none; letter-spacing: 1.5px; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover { color: var(--amber); }
+.nav-cta { background: var(--amber) !important; color: var(--black) !important; padding: 10px 24px; border-radius: var(--radius-pill); font-family: var(--font-display) !important; font-size: 14px !important; font-weight: 700 !important; letter-spacing: 2px !important; text-transform: uppercase !important; }
+.nav-cta:hover { background: var(--amber-light) !important; transform: translateY(-1px); }
+
+/* HERO */
+.hero { position: relative; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+.hero-left { position: relative; z-index: 2; background: var(--black); padding: 160px 52px 80px; display: flex; flex-direction: column; justify-content: center; }
+.hero-right { position: relative; overflow: hidden; }
+.hero-right-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, var(--black) 0%, rgba(10,11,10,0.7) 40%, rgba(10,11,10,0.2) 100%),
+              linear-gradient(180deg, rgba(10,11,10,0.4) 0%, rgba(10,11,10,0.1) 50%, rgba(10,11,10,0.6) 100%);
+  z-index: 1;
+}
+/* Industrial grid lines matching the deck */
+.hero-right-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(247,150,70,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(247,150,70,0.05) 1px, transparent 1px);
+  background-size: 56px 56px; z-index: 2;
+}
+/* Amber diagonal accent */
+.hero-right-bg::before {
+  content: ''; position: absolute;
+  top: -100px; right: -100px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(247,150,70,0.08) 0%, transparent 70%);
+  z-index: 3;
+}
+
+.phones-wrap {
+  position: absolute; inset: 0; z-index: 4;
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 32px 40px;
+}
+
+.phones-stage { position: relative; width: 420px; height: 600px; }
+
+.phone {
+  position: absolute; border-radius: 40px; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.07);
+  transition: transform 0.4s ease;
+}
+.phone:hover { transform: translateY(-10px) !important; }
+.phone.front {
+  width: 250px; left: 50%; top: 0; transform: translateX(-50%);
+  z-index: 3;
+  box-shadow: 0 48px 96px rgba(0,0,0,0.8), 0 0 0 1px rgba(247,150,70,0.25), 0 0 48px rgba(247,150,70,0.1);
+}
+.phone.bl { width: 210px; left: 10px; top: 80px; transform: rotate(-7deg); z-index: 2; opacity: 0.8; }
+.phone.br { width: 210px; right: 10px; top: 100px; transform: rotate(7deg); z-index: 2; opacity: 0.8; }
+
+.p-notch { background: #0A0B0A; padding: 10px 0 6px; display: flex; justify-content: center; }
+.p-pill { width: 80px; height: 6px; background: #1a1c1a; border-radius: 3px; }
+
+/* FOOTER LOGIC */
+footer { background: var(--near-black); padding: 80px 52px 40px; border-top: 1px solid rgba(247,150,70,0.1); }
+.foot-badges { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
+.fbadge { border: 1px solid rgba(247,150,70,0.3); padding: 4px 12px; border-radius: 4px; font-size: 10px; color: var(--amber); font-family: var(--font-mono); text-transform: uppercase; }
+
+</style>
+</head>
+<body>
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-hexmark">W</div>
+    <div class="nav-wordmark">Workify</div>
+  </a>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow"><div class="eyebrow-line"></div>AI-Driven Field Guidance</div>
+    <h1 class="h1">Curing the <span class="amber">$1,000</span> <br><span class="ital">Truck Roll.</span></h1>
+    <p class="hero-p">Workify is the <strong>safety-gated mentor</strong> for the next generation of HVAC technicians. Reducing callbacks and scaling expertise across 624,000 field employees.</p>
+    <div class="hero-acts">
+      <a href="#" class="btn-a">Start Branch Pilot</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-bot">
+    <div class="foot-copy">© 2026 Workify Inc. · Preserve Expertise. Deploy It Instantly.</div>
+    <div class="foot-badges">
+      <div class="fbadge">NIST AI RMF</div>
+      <div class="fbadge">EPA §608</div>
+      <div class="fbadge">AIM Act</div>
+      <div class="fbadge">SOC 2 Ready</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
